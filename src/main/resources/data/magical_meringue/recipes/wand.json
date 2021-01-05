@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern":
+  [
+    "l",
+    "x",
+    "x"
+  ],
+  "key":
+  {
+    "x":
+    {
+      "tag": "forge:rods/wooden"
+    },
+    "l":
+    {
+      "item": "minecraft:lapis_lazuli"
+    }
+  },
+  "result":
+  {
+    "item": "magical_meringue:wand",
+    "count": 1
+  }
+}
