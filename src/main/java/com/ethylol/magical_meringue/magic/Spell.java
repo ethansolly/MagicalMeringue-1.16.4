@@ -2,6 +2,9 @@ package com.ethylol.magical_meringue.magic;
 
 import com.ethylol.magical_meringue.magic.effects.one.*;
 import com.ethylol.magical_meringue.magic.effects.two.Exchange;
+import com.ethylol.magical_meringue.magic.effects.two.FeatherFalling;
+import com.ethylol.magical_meringue.magic.effects.two.Phasing;
+import org.lwjgl.system.CallbackI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +37,8 @@ public class Spell {
     public static final Spell summonUselessCat = new Spell(new SummonUselessCat());
 
     public static final Spell exchange = new Spell(new Exchange());
+    public static final Spell featherFalling = new Spell(new FeatherFalling());
+    public static final Spell phasing = new Spell(new Phasing());
 
     public static final List<Spell> list = new ArrayList<>();
     static {
@@ -49,5 +54,7 @@ public class Spell {
         list.add(summonUselessCat);
 
         list.add(exchange);
+        list.add(featherFalling);
+        list.add(phasing);
     }
 }

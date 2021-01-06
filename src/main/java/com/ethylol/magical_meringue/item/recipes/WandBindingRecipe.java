@@ -32,7 +32,6 @@ public class WandBindingRecipe extends SpecialRecipe {
         this.recipeItems = new ArrayList<>();
         recipeItems.add(Ingredient.fromItems(ModItems.wand));
         recipeItems.add(Ingredient.fromItems(ModItems.spellbook));
-
     }
 
     @Override
