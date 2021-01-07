@@ -30,6 +30,7 @@ public class ManaProvider implements ICapabilitySerializable<CompoundNBT> {
             for (int i = 0; i < IManaHandler.MAX_TIER; i++) {
                 compoundNBT.putFloat("mana_" + i, manaHandler.getMana(i));
             }
+            compoundNBT.putInt("state", manaHandler.getCasterState().ordinal());
         });
         return compoundNBT;
     }
@@ -41,6 +42,7 @@ public class ManaProvider implements ICapabilitySerializable<CompoundNBT> {
             for (int i = 0; i < IManaHandler.MAX_TIER; i++) {
                 manaHandler.setMana(i, nbt.getFloat("mana_" + i));
             }
+            manaHandler.setCasterState(IManaHandler.CasterState.values()[nbt.getInt("state")]);
         });
     }
 

@@ -1,5 +1,6 @@
 package com.ethylol.magical_meringue.network;
 
+import com.ethylol.magical_meringue.MagicalMeringueCore;
 import com.ethylol.magical_meringue.capabilities.join.JoinMessage;
 import com.ethylol.magical_meringue.capabilities.join.JoinMessageHandler;
 import com.ethylol.magical_meringue.capabilities.mana.IManaHandler;
@@ -9,6 +10,8 @@ import com.ethylol.magical_meringue.item.ModItems;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.handler.codec.EncoderException;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTSizeTracker;
@@ -16,6 +19,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import java.io.IOException;

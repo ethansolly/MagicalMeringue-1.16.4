@@ -8,6 +8,7 @@ public class ManaHandler implements IManaHandler {
 
     int lvl;
     float[] mana;
+    CasterState casterState;
 
     public ManaHandler() {
         lvl = 10;
@@ -15,6 +16,7 @@ public class ManaHandler implements IManaHandler {
         for (int i = 0; i < IManaHandler.MAX_TIER; i++) {
             mana[i] = Utils.maxMana(i, lvl);
         }
+        casterState = CasterState.DEFAULT;
     }
 
     @Override
@@ -38,6 +40,16 @@ public class ManaHandler implements IManaHandler {
     }
 
     @Override
+    public CasterState getCasterState() {
+        return casterState;
+    }
+
+    @Override
+    public void setCasterState(CasterState state) {
+        casterState = state;
+    }
+
+    @Override
     public int getLvl() {
         return lvl;
     }
@@ -56,6 +68,7 @@ public class ManaHandler implements IManaHandler {
         for (int i = 0; i < IManaHandler.MAX_TIER; i++) {
             compound.putFloat("mana_" + i, mana[i]);
         }
+        compound.putInt("state", casterState.ordinal());
         return compound;
     }
 
@@ -66,5 +79,6 @@ public class ManaHandler implements IManaHandler {
         for (int i = 0; i < IManaHandler.MAX_TIER; i++) {
             mana[i] = compound.getFloat("mana_" + i);
         }
+        casterState = CasterState.values()[compound.getInt("state")];
     }
 }

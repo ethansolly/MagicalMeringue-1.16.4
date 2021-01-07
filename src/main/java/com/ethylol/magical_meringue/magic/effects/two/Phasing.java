@@ -30,7 +30,7 @@ public class Phasing implements ISpellEffect {
                     double y = world.getHeight(Heightmap.Type.WORLD_SURFACE, (int)x, (int)z);
                     if (caster.attemptTeleport(x, y, z,true)) {
                         iManaHandler.useMana(1, 4);
-                        MagicalMeringueCore.network.sendTo(new ManaMessage(iManaHandler), ((ServerPlayerEntity) caster).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                        Capabilities.sendManaMessageToClient(caster, iManaHandler);
                     }
                 }
             });

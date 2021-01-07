@@ -28,7 +28,7 @@ public class SummonUselessCat implements ISpellEffect {
                     world.addEntity(ocelot);
 
                     manaHandler.useMana(0, 4);
-                    MagicalMeringueCore.network.sendTo(new ManaMessage(manaHandler), ((ServerPlayerEntity) caster).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                    Capabilities.sendManaMessageToClient(caster, manaHandler);
                 }
             }
         }

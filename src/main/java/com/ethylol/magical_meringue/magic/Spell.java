@@ -1,6 +1,7 @@
 package com.ethylol.magical_meringue.magic;
 
 import com.ethylol.magical_meringue.magic.effects.one.*;
+import com.ethylol.magical_meringue.magic.effects.two.AstralProjection;
 import com.ethylol.magical_meringue.magic.effects.two.Exchange;
 import com.ethylol.magical_meringue.magic.effects.two.FeatherFalling;
 import com.ethylol.magical_meringue.magic.effects.two.Phasing;
@@ -36,12 +37,14 @@ public class Spell {
     public static final Spell smeltItem = new Spell(new SmeltItem());
     public static final Spell summonUselessCat = new Spell(new SummonUselessCat());
 
+    public static final Spell astralProjection = new Spell(new AstralProjection());
     public static final Spell exchange = new Spell(new Exchange());
     public static final Spell featherFalling = new Spell(new FeatherFalling());
     public static final Spell phasing = new Spell(new Phasing());
 
     public static final List<Spell> list = new ArrayList<>();
     static {
+        //Tier 1
         list.add(acidSplash);
         list.add(breakBlock);
         list.add(changeColor);
@@ -53,6 +56,8 @@ public class Spell {
         list.add(smeltItem);
         list.add(summonUselessCat);
 
+        //Tier 2
+        list.add(astralProjection);
         list.add(exchange);
         list.add(featherFalling);
         list.add(phasing);

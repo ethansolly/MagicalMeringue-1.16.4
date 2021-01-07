@@ -21,7 +21,7 @@ public class CureMinorWounds implements ISpellEffect {
                 if (manaHandler.getMana(0) >= 1) {
                     caster.heal(1);
                     manaHandler.useMana(0, 1);
-                    MagicalMeringueCore.network.sendTo(new ManaMessage(manaHandler), ((ServerPlayerEntity) caster).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                    Capabilities.sendManaMessageToClient(caster, manaHandler);
                 }
             });
         }

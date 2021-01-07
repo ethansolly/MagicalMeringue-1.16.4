@@ -21,6 +21,7 @@ public class ManaMessageHandler implements BiConsumer<ManaMessage, Supplier<Netw
                 for (int i = 0; i < IManaHandler.MAX_TIER; i++) {
                     manaHandler.setMana(i, message.mana[i]);
                 }
+                manaHandler.setCasterState(message.getState());
             });
         });
         ctx.get().setPacketHandled(true);

@@ -6,10 +6,12 @@ public class ManaMessage {
 
     int lvl;
     float[] mana;
+    IManaHandler.CasterState state;
 
     public ManaMessage() {
         lvl = 1;
         mana = new float[IManaHandler.MAX_TIER];
+        state = IManaHandler.CasterState.DEFAULT;
     }
 
     public ManaMessage(IManaHandler manaHandler) {
@@ -18,11 +20,13 @@ public class ManaMessage {
         for (int i = 0; i < IManaHandler.MAX_TIER; i++) {
             mana[i] = manaHandler.getMana(i);
         }
+        state = manaHandler.getCasterState();
     }
 
     public ManaMessage(int lvl, float...mana) {
         this.lvl = lvl;
         this.mana = mana;
+        state = IManaHandler.CasterState.DEFAULT;
     }
 
     public int getLvl() {
@@ -32,4 +36,6 @@ public class ManaMessage {
     public float[] getMana() {
         return mana;
     }
+
+    public IManaHandler.CasterState getState() { return state; }
 }

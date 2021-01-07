@@ -23,7 +23,7 @@ public class InvisibilityFlash implements ISpellEffect {
                 if (manaHandler.getMana(0) >= 8) {
                     caster.addPotionEffect(new EffectInstance(Effects.INVISIBILITY, 200));
                     manaHandler.useMana(0, 8);
-                    MagicalMeringueCore.network.sendTo(new ManaMessage(manaHandler), ((ServerPlayerEntity) caster).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                    Capabilities.sendManaMessageToClient(caster, manaHandler);
                 }
             });
         }

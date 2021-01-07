@@ -1,0 +1,50 @@
+{
+  "effects": {
+    "mood_sound": {
+      "sound": "minecraft:ambient.underwater.loop",
+      "tick_delay": 6000,
+      "block_search_extent": 8,
+      "offset": 2
+    },
+    "sky_color": 16777215,
+    "fog_color": 16777215,
+    "water_color": 16777215,
+    "water_fog_color": 16777215,
+    "particle": {
+      "options": {
+        "type": "minecraft:smoke"
+      },
+      "probability": 0.015
+    },
+    "ambient_sound": "minecraft:ambient.underwater.loop"
+  },
+  "carvers": {
+    "air": [
+      "minecraft:canyon"
+    ]
+  },
+  "starts": [],
+  "features": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    []
+  ],
+  "spawners": {},
+  "category": "none",
+  "precipitation": "snow",
+  "surface_builder": "magical_meringue:astral_waves",
+  "scale": 2,
+  "downfall": 0,
+  "depth": 0.12,
+  "temperature": 0,
+  "player_spawn_friendly": false,
+  "spawn_costs": {},
+  "creature_spawn_probability": 0
+}

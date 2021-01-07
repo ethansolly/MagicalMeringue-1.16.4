@@ -50,7 +50,7 @@ public class RayTraceMessageHandler implements BiConsumer<RayTraceMessage, Suppl
                         ctx.get().enqueueWork(() -> {
                             w.destroyBlock(pos, true);
                             manaHandler.useMana(0, cost);
-                            MagicalMeringueCore.network.sendTo(new ManaMessage(manaHandler), playerMP.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                            Capabilities.sendManaMessageToClient(playerMP, manaHandler);
                         });
                     }
                 }
@@ -66,7 +66,7 @@ public class RayTraceMessageHandler implements BiConsumer<RayTraceMessage, Suppl
                             ctx.get().enqueueWork(() -> {
                                 ((LivingEntity) e).addPotionEffect(new EffectInstance(Effects.LEVITATION, 200));
                                 manaHandler.useMana(0, 1);
-                                MagicalMeringueCore.network.sendTo(new ManaMessage(manaHandler), playerMP.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                                Capabilities.sendManaMessageToClient(playerMP, manaHandler);
                             });
                         }
                     }
@@ -89,7 +89,7 @@ public class RayTraceMessageHandler implements BiConsumer<RayTraceMessage, Suppl
                                 playerMP.setHeldItem(Hand.OFF_HAND, j);
 
                                 manaHandler.useMana(1, 4);
-                                MagicalMeringueCore.network.sendTo(new ManaMessage(manaHandler), playerMP.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                                Capabilities.sendManaMessageToClient(playerMP, manaHandler);
 
                             } else if (!le.getHeldItemOffhand().isEmpty()) {
 
@@ -99,7 +99,7 @@ public class RayTraceMessageHandler implements BiConsumer<RayTraceMessage, Suppl
                                 playerMP.setHeldItem(Hand.OFF_HAND, j);
 
                                 manaHandler.useMana(1, 4);
-                                MagicalMeringueCore.network.sendTo(new ManaMessage(manaHandler), playerMP.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                                Capabilities.sendManaMessageToClient(playerMP, manaHandler);
 
                             }
                         }

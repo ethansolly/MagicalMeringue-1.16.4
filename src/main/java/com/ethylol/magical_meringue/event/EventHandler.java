@@ -14,6 +14,7 @@ import com.ethylol.magical_meringue.item.ModItems;
 import com.ethylol.magical_meringue.item.Spellbook;
 import com.ethylol.magical_meringue.utils.Utils;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
@@ -23,8 +24,18 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.INBT;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.Dimension;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.server.TicketType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -32,6 +43,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
@@ -125,12 +137,65 @@ public class EventHandler {
     @SubscribeEvent
     public static void playerWakeUp(PlayerWakeUpEvent event) {
         PlayerEntity player = event.getPlayer();
+        World w = player.world;
         LazyOptional<IManaHandler> manaHandlerLO = player.getCapability(Capabilities.MANA_HANDLER_CAPABILITY, null);
         manaHandlerLO.ifPresent(manaHandler -> {
             int level = manaHandler.getLvl();
             for(int i = 0; i < manaHandler.getLvl(); i++) {
                 manaHandler.setMana(i, Utils.maxMana(i, level));
             }
+
+            if (!w.isRemote && w instanceof ServerWorld) {
+
+                ResourceLocation resourcelocation = new ResourceLocation(MagicalMeringueCore.MODID, "astral_plane");
+                RegistryKey<World> registrykey = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, resourcelocation);
+                ServerWorld astroworld = w.getServer().getWorld(registrykey);
+
+                if (manaHandler.getCasterState() == IManaHandler.CasterState.ASTRAL) {
+                    if (player.world != astroworld && astroworld != null) {
+                        manaHandler.setCasterState(IManaHandler.CasterState.PORTAL);
+                        Capabilities.sendManaMessageToClient(player, manaHandler);
+                    }
+                }
+
+                /*
+                if (player.world == astroworld) {
+                    ServerWorld overworld = w.getServer().getWorld(World.OVERWORLD);
+                    player.changeDimension(overworld);
+                }
+                 */
+            }
+
         });
+    }
+
+    @SubscribeEvent
+    public static void onWorldTick(TickEvent.WorldTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            //End of tick
+            MinecraftServer server = event.world.getServer();
+            if (!event.world.isRemote) {
+                for (PlayerEntity player : server.getPlayerList().getPlayers()) {
+                    LazyOptional<IManaHandler> manaHandlerLO = player.getCapability(Capabilities.MANA_HANDLER_CAPABILITY, null);
+                    manaHandlerLO.ifPresent(manaHandler -> {
+                        if (manaHandler.getCasterState() == IManaHandler.CasterState.PORTAL) {
+
+                            ResourceLocation resourcelocation = new ResourceLocation(MagicalMeringueCore.MODID, "astral_plane");
+                            RegistryKey<World> registrykey = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, resourcelocation);
+                            ServerWorld astroworld = server.getWorld(registrykey);
+
+                            double x = player.getPosX();
+                            double z = player.getPosZ();
+                            astroworld.getChunk((int) x >> 4, (int) z >> 4);
+                            double y = astroworld.getHeight(Heightmap.Type.WORLD_SURFACE, (int) x, (int) z);
+                            ((ServerPlayerEntity) player).teleport(astroworld, x, y, z, player.rotationYaw, player.rotationPitch);
+                            manaHandler.setCasterState(IManaHandler.CasterState.DEFAULT);
+                            Capabilities.sendManaMessageToClient(player, manaHandler);
+
+                        }
+                    });
+                }
+            }
+        }
     }
 }

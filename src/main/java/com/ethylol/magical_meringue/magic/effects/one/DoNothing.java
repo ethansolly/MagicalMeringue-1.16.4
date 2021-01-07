@@ -20,7 +20,7 @@ public class DoNothing implements ISpellEffect {
             manaHandlerLO.ifPresent(manaHandler -> {
                 if (manaHandler.getMana(0) >= 1) {
                     manaHandler.useMana(0, 1);
-                    MagicalMeringueCore.network.sendTo(new ManaMessage(manaHandler), ((ServerPlayerEntity) caster).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                    Capabilities.sendManaMessageToClient(caster, manaHandler);
                 }
             });
         }

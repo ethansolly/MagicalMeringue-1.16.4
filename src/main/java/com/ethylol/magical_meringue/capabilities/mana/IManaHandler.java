@@ -14,6 +14,15 @@ public interface IManaHandler extends INBTSerializable<INBT> {
     float getMana(int tier);
     void setMana(int tier, float amt);
 
+    CasterState getCasterState();
+    void setCasterState(CasterState state);
+
     int getLvl();
     void setLvl(int lvl);
+
+    enum CasterState {
+        DEFAULT,
+        ASTRAL,
+        PORTAL
+    }
 }

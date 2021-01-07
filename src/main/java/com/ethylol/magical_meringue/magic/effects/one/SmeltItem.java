@@ -45,7 +45,7 @@ public class SmeltItem implements ISpellEffect {
                         if (optional.isPresent()) {
                             caster.inventory.addItemStackToInventory(optional.get().getRecipeOutput().copy());
                             manaHandler.useMana(0, 4);
-                            MagicalMeringueCore.network.sendTo(new ManaMessage(manaHandler), ((ServerPlayerEntity)caster).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                            Capabilities.sendManaMessageToClient(caster, manaHandler);
                         }
                     }
                 }
