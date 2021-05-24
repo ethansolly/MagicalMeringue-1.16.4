@@ -15,4 +15,9 @@ public class ModItems {
     @ObjectHolder("wand")
     public static final Item wand = null;
 
+    @ObjectHolder("tachium_ingot")
+    public static final Item tachium_ingot = null;
+
+
+
 }

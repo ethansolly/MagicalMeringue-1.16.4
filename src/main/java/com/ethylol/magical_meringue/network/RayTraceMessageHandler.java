@@ -45,6 +45,7 @@ public class RayTraceMessageHandler implements BiConsumer<RayTraceMessage, Suppl
                 //Break Block
                 BlockState blockState = w.getBlockState(pos);
                 if (blockState.getBlockHardness(w, pos) != -1.0f) {
+                    // cost = 4*(default breaking time in seconds)
                     float cost = (float) Math.ceil(blockState.getBlockHardness(w, pos) * 30.0f) / 5.0f;
                     if (manaHandler.getMana(0) >= cost) {
                         ctx.get().enqueueWork(() -> {

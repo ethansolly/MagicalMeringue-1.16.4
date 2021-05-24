@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:ore",
+  "config": {
+    "size": 9,
+    "target": {
+      "block": "minecraft:smooth_quartz",
+      "predicate_type": "minecraft:block_match"
+    },
+    "state": {
+      "Name": "magical_meringue:tachium_ore"
+    }
+  }
+}

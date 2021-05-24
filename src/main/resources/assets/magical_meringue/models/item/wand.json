@@ -1,8 +1,8 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "magical_meringue:items/wand",
-		"particle": "magical_meringue:items/wand"
+		"0": "magical_meringue:item/wand",
+		"particle": "magical_meringue:item/wand"
 	},
 	"elements": [
 		{

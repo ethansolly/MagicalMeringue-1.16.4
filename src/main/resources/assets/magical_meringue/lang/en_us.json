@@ -1,5 +1,9 @@
 {
+    "block.magical_meringue.tachium_block": "Tachium Block",
+    "block.magical_meringue.tachium_ore": "Tachium Ore",
+
     "item.magical_meringue.spellbook": "Spellbook",
+    "item.magical_meringue.tachium_ingot": "Tachium Ingot",
     "item.magical_meringue.wand": "Wand",
 
     "itemGroup.magical_meringue": "Magical Meringue"

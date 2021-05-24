@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern":
+  [
+    "xxx",
+    "xxx",
+    "xxx"
+  ],
+  "key":
+  {
+    "x":
+    {
+      "item": "magical_meringue:tachium_ingot"
+    }
+  },
+  "result":
+  {
+    "item": "magical_meringue:tachium_block",
+    "count": 1
+  }
+}

@@ -33,6 +33,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Dimension;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
@@ -41,16 +42,23 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
+import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.logging.log4j.core.jmx.Server;
+
+import java.util.ArrayList;
+
+import static com.ethylol.magical_meringue.event.RegistrationHandler.*;
 
 @Mod.EventBusSubscriber()
 public class EventHandler {
@@ -173,16 +181,17 @@ public class EventHandler {
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             //End of tick
-            MinecraftServer server = event.world.getServer();
             if (!event.world.isRemote) {
+
+                MinecraftServer server = event.world.getServer();
+                ResourceLocation resourcelocation = new ResourceLocation(MagicalMeringueCore.MODID, "astral_plane");
+                RegistryKey<World> registrykey = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, resourcelocation);
+                ServerWorld astroworld = server.getWorld(registrykey);
+
                 for (PlayerEntity player : server.getPlayerList().getPlayers()) {
                     LazyOptional<IManaHandler> manaHandlerLO = player.getCapability(Capabilities.MANA_HANDLER_CAPABILITY, null);
                     manaHandlerLO.ifPresent(manaHandler -> {
                         if (manaHandler.getCasterState() == IManaHandler.CasterState.PORTAL) {
-
-                            ResourceLocation resourcelocation = new ResourceLocation(MagicalMeringueCore.MODID, "astral_plane");
-                            RegistryKey<World> registrykey = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, resourcelocation);
-                            ServerWorld astroworld = server.getWorld(registrykey);
 
                             double x = player.getPosX();
                             double z = player.getPosZ();
@@ -195,7 +204,33 @@ public class EventHandler {
                         }
                     });
                 }
+
+                if ((event.world.getDayTime() == 24000 || event.world.getDayTime() == 0) && astroworld != null) {
+                    for (ServerPlayerEntity spe : new ArrayList<>(astroworld.getPlayers())) {
+
+                        ResourceLocation resourcelocationOverworld = new ResourceLocation("minecraft:overworld");
+                        RegistryKey<World> registrykeyOverworld = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, resourcelocationOverworld);
+                        ServerWorld overworld = server.getWorld(registrykeyOverworld);
+
+                        BlockPos spawnPos = spe.func_241140_K_();
+                        int x = spawnPos.getX();
+                        int y = spawnPos.getY();
+                        int z = spawnPos.getZ();
+                        overworld.getChunk((int) x >> 4, (int) z >> 4);
+                        float spawnAngle = spe.func_242109_L();
+                        spe.teleport(overworld, x, y, z, 0, spawnAngle);
+                    }
+                }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void subscribeBiomeLoading(BiomeLoadingEvent event) {
+        BiomeGenerationSettingsBuilder generation = event.getGeneration();
+        if (event.getName() != null && event.getName().toString().equals("magical_meringue:astral_plane")) {
+            generation.withFeature(GenerationStage.Decoration.UNDERGROUND_ORES, ore_tachium);
+            generation.withFeature(GenerationStage.Decoration.LOCAL_MODIFICATIONS, platonium_feature_configured);
         }
     }
 }

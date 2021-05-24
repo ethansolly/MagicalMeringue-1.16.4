@@ -1,15 +1,16 @@
 package com.ethylol.magical_meringue;
 
 import com.ethylol.magical_meringue.capabilities.Capabilities;
+import com.ethylol.magical_meringue.entity.ModEntities;
+import com.ethylol.magical_meringue.entity.UnicornEntity;
 import com.ethylol.magical_meringue.event.RegistrationHandler;
 import com.ethylol.magical_meringue.network.NetworkHandler;
+import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
+import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -51,10 +52,15 @@ public class MagicalMeringueCore {
         NetworkHandler.register(network);
         Capabilities.register();
 
+        event.enqueueWork(() -> {
+            GlobalEntityTypeAttributes.put(ModEntities.unicorn, UnicornEntity.setCustomAttributes().create());
+        });
+
     }
 
     public void clientSetup(final FMLClientSetupEvent event) {
         //Client setup
+        RegistrationHandler.registerEntityRenderers();
     }
 
     public void enqueueIMC(final InterModEnqueueEvent event) {
@@ -67,5 +73,6 @@ public class MagicalMeringueCore {
     public static Logger getLogger() {
         return logger;
     }
+
 
 }

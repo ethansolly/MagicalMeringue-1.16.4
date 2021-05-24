@@ -27,16 +27,25 @@
   "features": [
     [],
     [],
+    ["magical_meringue:platonium_feature"],
     [],
     [],
     [],
-    [],
-    [],
+    ["magical_meringue:ore_tachium"],
     [],
     [],
     []
   ],
-  "spawners": {},
+  "spawners": {
+    "creature": [
+      {
+        "type": "magical_meringue:unicorn",
+        "weight": 1,
+        "minCount": 0,
+        "maxCount": 20
+      }
+    ]
+  },
   "category": "none",
   "precipitation": "snow",
   "surface_builder": "magical_meringue:astral_waves",
