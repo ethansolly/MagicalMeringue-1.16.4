@@ -1,18 +1,24 @@
 package com.ethylol.magical_meringue.network;
 
 import com.ethylol.magical_meringue.MagicalMeringueCore;
+import com.ethylol.magical_meringue.block.ModBlocks;
 import com.ethylol.magical_meringue.capabilities.Capabilities;
 import com.ethylol.magical_meringue.capabilities.mana.IManaHandler;
 import com.ethylol.magical_meringue.capabilities.mana.ManaMessage;
+import com.ethylol.magical_meringue.item.ModItems;
+import com.ethylol.magical_meringue.magic.damage.Acid;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.TorchBlock;
 import net.minecraft.block.WallTorchBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.Direction;
@@ -40,10 +46,30 @@ public class RayTraceMessageHandler implements BiConsumer<RayTraceMessage, Suppl
             World w = playerMP.world;
             BlockPos pos = message.getPos();
 
-            if (message.getMessageType() == RayTraceMessage.MessageType.BREAK_BLOCK) {
+            if (message.getMessageType() == RayTraceMessage.MessageType.ACID_SPLASH) {
+
+                List<Entity> list = w.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos.add(-1.5, 0, -1.5), pos.add(1.5, 3, 1.5)));
+
+                for (Entity e : list) {
+                    if (manaHandler.getMana(0) >= 3) {
+                        if (e instanceof LivingEntity) {
+                            ctx.get().enqueueWork(() -> {
+                                ((LivingEntity) e).attackEntityFrom(new Acid(playerMP), 6.0f);
+                                manaHandler.useMana(0, 3);
+                                Capabilities.sendManaMessageToClient(playerMP, manaHandler);
+                            });
+                        }
+                    }
+                    else break;
+                }
+
+
+
+            } else if (message.getMessageType() == RayTraceMessage.MessageType.BREAK_BLOCK) {
 
                 //Break Block
                 BlockState blockState = w.getBlockState(pos);
+                //not indestructible
                 if (blockState.getBlockHardness(w, pos) != -1.0f) {
                     // cost = 4*(default breaking time in seconds)
                     float cost = (float) Math.ceil(blockState.getBlockHardness(w, pos) * 30.0f) / 5.0f;
@@ -81,28 +107,89 @@ public class RayTraceMessageHandler implements BiConsumer<RayTraceMessage, Suppl
                     Entity e = list.get(0);
                     if (manaHandler.getMana(1) >= 4) {
                         if (e instanceof LivingEntity) {
-                            LivingEntity le = (LivingEntity) e;
-                            if (!le.getHeldItemMainhand().isEmpty()) {
+                            ctx.get().enqueueWork(() -> {
+                                LivingEntity le = (LivingEntity) e;
+                                if (!le.getHeldItemMainhand().isEmpty()) {
 
-                                ItemStack i = playerMP.getHeldItemOffhand().copy();
-                                ItemStack j = le.getHeldItemMainhand().copy();
-                                le.setHeldItem(Hand.MAIN_HAND, i);
-                                playerMP.setHeldItem(Hand.OFF_HAND, j);
+                                    ItemStack i = playerMP.getHeldItemOffhand().copy();
+                                    ItemStack j = le.getHeldItemMainhand().copy();
+                                    le.setHeldItem(Hand.MAIN_HAND, i);
+                                    playerMP.setHeldItem(Hand.OFF_HAND, j);
 
-                                manaHandler.useMana(1, 4);
+                                    manaHandler.useMana(1, 4);
+                                    Capabilities.sendManaMessageToClient(playerMP, manaHandler);
+
+                                } else if (!le.getHeldItemOffhand().isEmpty()) {
+
+                                    ItemStack i = playerMP.getHeldItemOffhand().copy();
+                                    ItemStack j = le.getHeldItemOffhand().copy();
+                                    le.setHeldItem(Hand.OFF_HAND, i);
+                                    playerMP.setHeldItem(Hand.OFF_HAND, j);
+
+                                    manaHandler.useMana(1, 4);
+                                    Capabilities.sendManaMessageToClient(playerMP, manaHandler);
+
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            else if (message.getMessageType() == RayTraceMessage.MessageType.LASSO) {
+
+                //Lasso
+                List<Entity> list = w.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos, pos.add(1, 1, 1)));
+                if (!list.isEmpty()) {
+                    Entity e = list.get(0);
+                    if (manaHandler.getMana(0) >= 8) {
+                        if (e instanceof LivingEntity) {
+                            ctx.get().enqueueWork(() -> {
+
+                                e.setPosition(playerMP.getPosX(), playerMP.getPosY(),playerMP.getPosZ());
+
+                                manaHandler.useMana(0, 8);
                                 Capabilities.sendManaMessageToClient(playerMP, manaHandler);
+                            });
+                        }
+                    }
+                }
 
-                            } else if (!le.getHeldItemOffhand().isEmpty()) {
 
-                                ItemStack i = playerMP.getHeldItemOffhand().copy();
-                                ItemStack j = le.getHeldItemOffhand().copy();
-                                le.setHeldItem(Hand.OFF_HAND, i);
-                                playerMP.setHeldItem(Hand.OFF_HAND, j);
+            }
 
-                                manaHandler.useMana(1, 4);
+            else if (message.getMessageType() == RayTraceMessage.MessageType.SEPARATE) {
+
+                if (!w.isRemote) {
+
+                    BlockState blockCenter = w.getBlockState(pos);
+
+                    int tachium_count = 0;
+                    tachium_count += (w.getBlockState(pos.east()).getBlock() == ModBlocks.tachium_block)? 1 : 0;
+                    tachium_count += (w.getBlockState(pos.west()).getBlock() == ModBlocks.tachium_block)? 1 : 0;
+                    tachium_count += (w.getBlockState(pos.north()).getBlock() == ModBlocks.tachium_block)? 1 : 0;
+                    tachium_count += (w.getBlockState(pos.south()).getBlock() == ModBlocks.tachium_block)? 1 : 0;
+                    tachium_count += (w.getBlockState(pos.up()).getBlock() == ModBlocks.tachium_block)? 1 : 0;
+                    tachium_count += (w.getBlockState(pos.down()).getBlock() == ModBlocks.tachium_block)? 1 : 0;
+
+                    if (tachium_count >= 4) {
+                        //Separate!
+
+                        if (blockCenter.getBlock() == ModBlocks.platonium_block && manaHandler.getMana(1) >= 4) {
+
+                            int finalTachium_count = tachium_count;
+                            ctx.get().enqueueWork(() -> {
+
+                                w.removeBlock(pos, false);
+
+                                for (int i = 0; i < finalTachium_count; i++) {
+                                    ItemEntity itemEntity = new ItemEntity(w, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(ModItems.platonium_ingot));
+                                    w.addEntity(itemEntity);
+                                }
+
+                                manaHandler.useMana(1, finalTachium_count);
                                 Capabilities.sendManaMessageToClient(playerMP, manaHandler);
+                            });
 
-                            }
                         }
                     }
                 }

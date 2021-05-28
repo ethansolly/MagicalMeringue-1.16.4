@@ -10,23 +10,29 @@ import com.ethylol.magical_meringue.capabilities.mana.IManaHandler;
 import com.ethylol.magical_meringue.capabilities.mana.ManaHandler;
 import com.ethylol.magical_meringue.capabilities.mana.ManaMessage;
 import com.ethylol.magical_meringue.capabilities.mana.ManaProvider;
+import com.ethylol.magical_meringue.entity.CaveLordEntity;
+import com.ethylol.magical_meringue.entity.ModEntities;
 import com.ethylol.magical_meringue.item.ModItems;
 import com.ethylol.magical_meringue.item.Spellbook;
 import com.ethylol.magical_meringue.utils.Utils;
-import net.minecraft.block.Block;
+import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.INBT;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.IntegerProperty;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.Registry;
@@ -47,9 +53,11 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -230,7 +238,75 @@ public class EventHandler {
         BiomeGenerationSettingsBuilder generation = event.getGeneration();
         if (event.getName() != null && event.getName().toString().equals("magical_meringue:astral_plane")) {
             generation.withFeature(GenerationStage.Decoration.UNDERGROUND_ORES, ore_tachium);
-            generation.withFeature(GenerationStage.Decoration.LOCAL_MODIFICATIONS, platonium_feature_configured);
+            generation.withFeature(GenerationStage.Decoration.UNDERGROUND_DECORATION, platonium_feature_configured);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
+        World world = (World) event.getWorld();
+        if (!world.isRemote) {
+            BlockState blockState = event.getPlacedBlock();
+            Block block = blockState.getBlock();
+            BlockPos pos = event.getPos();
+            if (block == Blocks.CREEPER_HEAD || block == Blocks.CREEPER_WALL_HEAD) {
+                if (world.getBlockState(pos.down(1)).getBlock() == Blocks.BONE_BLOCK && world.getBlockState(pos.down(2)).getBlock() == Blocks.BONE_BLOCK) {
+                    world.removeBlock(pos, false);
+                    world.removeBlock(pos.down(1), false);
+                    world.removeBlock(pos.down(2), false);
+
+                    CaveLordEntity caveLord = ModEntities.cave_lord.create(world);
+                    caveLord.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.STONE_SWORD));
+                    caveLord.setItemStackToSlot(EquipmentSlotType.HEAD, new ItemStack(Items.CREEPER_HEAD));
+                    caveLord.setLocationAndAngles(pos.getX()+0.5, pos.getY()+0.55-2, pos.getZ()+0.5, 0.0F, 0.0F);
+                    world.addEntity(caveLord);
+                }
+            } else if (block == Blocks.BONE_BLOCK) {
+                if ((world.getBlockState(pos.up(1)).getBlock() == Blocks.CREEPER_HEAD || world.getBlockState(pos.up(1)).getBlock() == Blocks.CREEPER_WALL_HEAD) && world.getBlockState(pos.down(1)).getBlock() == Blocks.BONE_BLOCK) {
+                    world.removeBlock(pos.up(1), false);
+                    world.removeBlock(pos, false);
+                    world.removeBlock(pos.down(1), false);
+
+                    CaveLordEntity caveLord = ModEntities.cave_lord.create(world);
+                    caveLord.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.STONE_SWORD));
+                    caveLord.setItemStackToSlot(EquipmentSlotType.HEAD, new ItemStack(Items.CREEPER_HEAD));
+                    caveLord.setLocationAndAngles(pos.getX()+0.5, pos.getY()+0.55-1, pos.getZ()+0.5, 0.0F, 0.0F);
+                    world.addEntity(caveLord);
+                }
+                else if ((world.getBlockState(pos.up(2)).getBlock() == Blocks.CREEPER_HEAD || world.getBlockState(pos.up(2)).getBlock() == Blocks.CREEPER_WALL_HEAD) && world.getBlockState(pos.up(1)).getBlock() == Blocks.BONE_BLOCK) {
+                    world.removeBlock(pos.up(2), false);
+                    world.removeBlock(pos.up(1), false);
+                    world.removeBlock(pos, false);
+
+                    CaveLordEntity caveLord = ModEntities.cave_lord.create(world);
+                    caveLord.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.STONE_SWORD));
+                    caveLord.setItemStackToSlot(EquipmentSlotType.HEAD, new ItemStack(Items.CREEPER_HEAD));
+                    caveLord.setLocationAndAngles(pos.getX()+0.5, pos.getY()+0.55, pos.getZ()+0.5, 0.0F, 0.0F);
+                    world.addEntity(caveLord);
+                }
+
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLivingDeath(LivingDeathEvent event) {
+        if (event.getEntity().getType() == ModEntities.cave_lord) {
+            Entity trueSource = event.getSource().getTrueSource();
+            if (trueSource != null && trueSource.getType() == EntityType.PLAYER) {
+                PlayerEntity player = (PlayerEntity) trueSource;
+                LazyOptional<IManaHandler> manaHandlerLO = player.getCapability(Capabilities.MANA_HANDLER_CAPABILITY, null);
+                manaHandlerLO.ifPresent(manaHandler -> {
+                    if (manaHandler.getLvl() == 1) {
+                        manaHandler.setLvl(2);
+                        for (int i = 0; i < IManaHandler.MAX_TIER; i++) {
+                            manaHandler.setMana(i, Utils.maxMana(i, 2));
+                        }
+                    }
+
+                    Capabilities.sendManaMessageToClient(player, manaHandler);
+                });
+            }
         }
     }
 }

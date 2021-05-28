@@ -8,6 +8,9 @@ import net.minecraftforge.registries.ObjectHolder;
 public class ModEntities {
 
     @ObjectHolder("unicorn")
-    public static final EntityType<UnicornEntity> unicorn = null;
+    public static EntityType<UnicornEntity> unicorn = null;
+
+    @ObjectHolder("cave_lord")
+    public static EntityType<CaveLordEntity> cave_lord = null;
 
 }

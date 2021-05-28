@@ -1,10 +1,7 @@
 package com.ethylol.magical_meringue.magic;
 
 import com.ethylol.magical_meringue.magic.effects.one.*;
-import com.ethylol.magical_meringue.magic.effects.two.AstralProjection;
-import com.ethylol.magical_meringue.magic.effects.two.Exchange;
-import com.ethylol.magical_meringue.magic.effects.two.FeatherFalling;
-import com.ethylol.magical_meringue.magic.effects.two.Phasing;
+import com.ethylol.magical_meringue.magic.effects.two.*;
 import org.lwjgl.system.CallbackI;
 
 import java.util.ArrayList;
@@ -40,7 +37,9 @@ public class Spell {
     public static final Spell astralProjection = new Spell(new AstralProjection());
     public static final Spell exchange = new Spell(new Exchange());
     public static final Spell featherFalling = new Spell(new FeatherFalling());
+    public static final Spell lasso = new Spell(new Lasso());
     public static final Spell phasing = new Spell(new Phasing());
+    public static final Spell separate = new Spell(new Separate());
 
     public static final List<Spell> list = new ArrayList<>();
     static {
@@ -60,6 +59,8 @@ public class Spell {
         list.add(astralProjection);
         list.add(exchange);
         list.add(featherFalling);
+        list.add(lasso);
         list.add(phasing);
+        list.add(separate);
     }
 }

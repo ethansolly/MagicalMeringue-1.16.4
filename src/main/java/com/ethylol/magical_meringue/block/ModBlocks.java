@@ -8,12 +8,12 @@ import net.minecraftforge.registries.ObjectHolder;
 public class ModBlocks {
 
     @ObjectHolder("tachium_ore")
-    public static final Block tachium_ore = null;
+    public static Block tachium_ore = null;
 
     @ObjectHolder("tachium_block")
-    public static final Block tachium_block = null;
+    public static Block tachium_block = null;
 
     @ObjectHolder("platonium_block")
-    public static final Block platonium_block = null;
+    public static Block platonium_block = null;
 
 }

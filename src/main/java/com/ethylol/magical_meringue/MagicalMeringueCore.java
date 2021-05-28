@@ -1,6 +1,7 @@
 package com.ethylol.magical_meringue;
 
 import com.ethylol.magical_meringue.capabilities.Capabilities;
+import com.ethylol.magical_meringue.entity.CaveLordEntity;
 import com.ethylol.magical_meringue.entity.ModEntities;
 import com.ethylol.magical_meringue.entity.UnicornEntity;
 import com.ethylol.magical_meringue.event.RegistrationHandler;
@@ -54,6 +55,7 @@ public class MagicalMeringueCore {
 
         event.enqueueWork(() -> {
             GlobalEntityTypeAttributes.put(ModEntities.unicorn, UnicornEntity.setCustomAttributes().create());
+            GlobalEntityTypeAttributes.put(ModEntities.cave_lord, CaveLordEntity.setCustomAttributes().create());
         });
 
     }

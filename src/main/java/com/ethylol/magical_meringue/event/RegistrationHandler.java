@@ -4,6 +4,8 @@ import com.ethylol.magical_meringue.MagicalMeringueCore;
 import com.ethylol.magical_meringue.block.ModBlocks;
 import com.ethylol.magical_meringue.client.gui.CreativeTab;
 import com.ethylol.magical_meringue.client.renderer.entity.UnicornRenderer;
+import com.ethylol.magical_meringue.entity.CaveLordEntity;
+import com.ethylol.magical_meringue.entity.ModEntities;
 import com.ethylol.magical_meringue.entity.UnicornEntity;
 import com.ethylol.magical_meringue.gen.feature.PlatoniumFeature;
 import com.ethylol.magical_meringue.item.Spellbook;
@@ -15,6 +17,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.SkeletonRenderer;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.BlockItem;
@@ -61,6 +64,8 @@ public class RegistrationHandler {
         event.getRegistry().register(new Spellbook());
         event.getRegistry().register((new Wand()));
         event.getRegistry().register((new Item((new Item.Properties()).group(CreativeTab.TAB)).setRegistryName(MagicalMeringueCore.MODID, "tachium_ingot")));
+        event.getRegistry().register((new Item((new Item.Properties()).group(CreativeTab.TAB)).setRegistryName(MagicalMeringueCore.MODID, "platonium_ingot")));
+
 
         //Register itemblocks
         registerItemBlock(ModBlocks.tachium_ore, (new Item.Properties()).group(CreativeTab.TAB), event);
@@ -99,20 +104,26 @@ public class RegistrationHandler {
         event.getRegistry().register(ModRecipes.WAND_BINDING_RECIPE_SERIALIZER);
     }
 
-    private static EntityType<UnicornEntity> unicornEntityType;
 
     @SubscribeEvent
     public static void registerEntity(RegistryEvent.Register<EntityType<?>> event) {
-        unicornEntityType = EntityType.Builder.create(UnicornEntity::new, EntityClassification.CREATURE).size(1.3964844F, 1.6F).trackingRange(10).build("magical_meringue:unicorn");
-        unicornEntityType.setRegistryName(new ResourceLocation(MagicalMeringueCore.MODID, "unicorn"));
-        event.getRegistry().register(unicornEntityType);
+        ModEntities.unicorn = EntityType.Builder.create(UnicornEntity::new, EntityClassification.CREATURE).size(1.3964844F, 1.6F).trackingRange(10).build("magical_meringue:unicorn");
+        ModEntities.unicorn.setRegistryName(new ResourceLocation(MagicalMeringueCore.MODID, "unicorn"));
+        event.getRegistry().register(ModEntities.unicorn);
+
+        ModEntities.cave_lord = EntityType.Builder.create(CaveLordEntity::new, EntityClassification.MONSTER).size(0.6F, 1.99F).trackingRange(8).build("magical_meringue:cave_lord");
+        ModEntities.cave_lord.setRegistryName(new ResourceLocation(MagicalMeringueCore.MODID, "cave_lord"));
+        event.getRegistry().register(ModEntities.cave_lord);
+
+
     }
 
     @OnlyIn(Dist.CLIENT)
     public static void registerEntityRenderers() {
         EntityRendererManager manager = Minecraft.getInstance().getRenderManager();
 
-        manager.register(unicornEntityType, new UnicornRenderer(manager));
+        manager.register(ModEntities.unicorn, new UnicornRenderer(manager));
+        manager.register(ModEntities.cave_lord, new SkeletonRenderer(manager));
     }
 
     //Ore/feature registration

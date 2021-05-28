@@ -10,14 +10,15 @@ public class ModItems {
     //ObjectHolder Entries
 
     @ObjectHolder("spellbook")
-    public static final Item spellbook = null;
+    public static Item spellbook = null;
 
     @ObjectHolder("wand")
-    public static final Item wand = null;
+    public static Item wand = null;
 
     @ObjectHolder("tachium_ingot")
-    public static final Item tachium_ingot = null;
+    public static Item tachium_ingot = null;
 
-
+    @ObjectHolder("platonium_ingot")
+    public static Item platonium_ingot = null;
 
 }

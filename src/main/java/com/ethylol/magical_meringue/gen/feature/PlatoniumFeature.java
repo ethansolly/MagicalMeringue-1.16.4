@@ -1,10 +1,12 @@
 package com.ethylol.magical_meringue.gen.feature;
 
+import com.ethylol.magical_meringue.block.ModBlocks;
 import com.mojang.serialization.Codec;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.ISeedReader;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
@@ -23,14 +25,29 @@ public class PlatoniumFeature extends Feature<NoFeatureConfig> {
         Type type = Type.values()[rand.nextInt(4)];
         int radius = rand.nextInt(32)+32;
 
+        //make sure chunks are generated before generating over them...hopefully this doesn't lead to any nasty cascading
+        //Unfortunately this does literally nothing
+
+        /*
+        for (int i = (pos.getX()-radius) >> 4; i < (pos.getX()+radius) >> 4; i++) {
+            for (int j = (pos.getZ()-radius) >> 4; j < (pos.getZ()+radius) >> 4; j++) {
+                reader.getChunk(i, j);
+            }
+        }
+         */
+
+
+
         double p = (1+Math.sqrt(5))/2;
 
         double[] vertX, vertY, vertZ;
+        double inradius;
 
         //A face is just a triple of vertices, so identify each vertex with an integer
         int[][] faces;
         if (type == Type.TETRAHEDRON) {
             double a = radius/Math.sqrt(3);
+            inradius = radius/3.0;
             vertX = new double[] {a,  a, -a, -a};
             vertY = new double[] {a, -a,  a, -a};
             vertZ = new double[] {a, -a, -a,  a};
@@ -39,6 +56,7 @@ public class PlatoniumFeature extends Feature<NoFeatureConfig> {
         }
         else if (type == Type.CUBE) {
             double a = radius/Math.sqrt(3);
+            inradius = a;
             vertX = new double[] {a,  a,  a,  a, -a, -a, -a, -a};
             vertY = new double[] {a,  a, -a, -a,  a,  a, -a, -a};
             vertZ = new double[] {a, -a,  a, -a,  a, -a,  a, -a};
@@ -47,6 +65,7 @@ public class PlatoniumFeature extends Feature<NoFeatureConfig> {
         }
         else if (type == Type.OCTAHEDRON) {
             double a = radius;
+            inradius = radius/Math.sqrt(3);
             vertX = new double[] {a, -a, 0,  0, 0,  0};
             vertY = new double[] {0,  0, a, -a, 0,  0};
             vertZ = new double[] {0,  0, 0,  0, a, -a};
@@ -55,6 +74,7 @@ public class PlatoniumFeature extends Feature<NoFeatureConfig> {
         }
         else if (type == Type.DODECAHEDRON) {
             double a = radius/Math.sqrt(3);
+            inradius = radius*p/Math.sqrt(9-3*p);
             vertX = new double[] {a,  a,  a,  a, -a, -a, -a, -a,     0,    0,   0,    0, a/p, a/p, -a/p, -a/p, a*p,  a*p,-a*p, -a*p};
             vertY = new double[] {a,  a, -a, -a,  a,  a, -a, -a,   a*p,  a*p,-a*p, -a*p,   0,   0,    0,    0, a/p, -a/p, a/p, -a/p};
             vertZ = new double[] {a, -a,  a, -a,  a, -a,  a, -a,   a/p, -a/p, a/p, -1/p, a*p,-a*p,  a*p, -a*p,   0,    0,   0,    0};
@@ -64,6 +84,7 @@ public class PlatoniumFeature extends Feature<NoFeatureConfig> {
         else {
             //ICOSAHEDRON
             double a = radius/Math.sqrt(p+2);
+            inradius = radius*p/Math.sqrt(9-3*p);
             vertX = new double[] {  0,   0,    0,    0, a,      a,  -a,   -a, a*p, a*p, -a*p, -a*p};
             vertY = new double[] {a*p, a*p, -a*p, -a*p, 0,      0,   0,    0,   a,  -a,    a,   -a};
             vertZ = new double[] {  a,  -a,    a,   -a, a*p, -a*p, a*p, -a*p,   0,   0,    0,    0};
@@ -120,37 +141,47 @@ public class PlatoniumFeature extends Feature<NoFeatureConfig> {
 
                     Vector3d point = new Vector3d(i, j, k);
 
-                    boolean inFeature = true;
+                    //hollow it out a bit
+                    if (point.length() > inradius) {
 
-                    for (int[] face : faces) {
-                        // Get normal vector
-                        // p0 = vertX[face[0]], vertY[face[0]], vertZ[face[0]]
-                        // p1 = vertX[face[1]], vertY[face[1]], vertZ[face[1]]
-                        // p2 = vertX[face[2]], vertY[face[2]], vertZ[face[2]]
-                        // u = p1 - p0, v = p2 - p0
-                        // normal vector = u cross v
+                        boolean inFeature = true;
 
-                        Vector3d p0 = new Vector3d(vertX[face[0]], vertY[face[0]], vertZ[face[0]]);
-                        Vector3d p1 = new Vector3d(vertX[face[1]], vertY[face[1]], vertZ[face[1]]);
-                        Vector3d p2 = new Vector3d(vertX[face[2]], vertY[face[2]], vertZ[face[2]]);
+                        for (int[] face : faces) {
+                            // Get normal vector
+                            // p0 = vertX[face[0]], vertY[face[0]], vertZ[face[0]]
+                            // p1 = vertX[face[1]], vertY[face[1]], vertZ[face[1]]
+                            // p2 = vertX[face[2]], vertY[face[2]], vertZ[face[2]]
+                            // u = p1 - p0, v = p2 - p0
+                            // normal vector = u cross v
 
-                        Vector3d u = p1.subtract(p0);
-                        Vector3d v = p2.subtract(p0);
-                        Vector3d normal = u.crossProduct(v).normalize();
+                            Vector3d p0 = new Vector3d(vertX[face[0]], vertY[face[0]], vertZ[face[0]]);
+                            Vector3d p1 = new Vector3d(vertX[face[1]], vertY[face[1]], vertZ[face[1]]);
+                            Vector3d p2 = new Vector3d(vertX[face[2]], vertY[face[2]], vertZ[face[2]]);
 
-                        Vector3d pointToFace = p0.subtract(point);
+                            Vector3d u = p1.subtract(p0);
+                            Vector3d v = p2.subtract(p0);
+                            Vector3d normal = u.crossProduct(v).normalize();
 
-                        double d = pointToFace.dotProduct(normal);
-                        d /= pointToFace.length();
+                            Vector3d pointToFace = p0.subtract(point);
 
-                        if (d < -1e-15) {
-                            //not in feature
-                            inFeature = false;
+                            double d = pointToFace.dotProduct(normal);
+                            d /= pointToFace.length();
+
+                            if (d < -1e-15) {
+                                //not in feature
+                                inFeature = false;
+                            }
+                        }
+
+                        if (inFeature) {
+                            this.setBlockState(reader, pos.add(i, j, k), ModBlocks.platonium_block.getDefaultState());
+                        }
+                        else {
+                            this.setBlockState(reader, pos.add(i, j,k ), Blocks.AIR.getDefaultState());
                         }
                     }
-
-                    if (inFeature) {
-                        this.setBlockState(reader, pos.add(i, j, k), Blocks.OBSIDIAN.getDefaultState());
+                    else {
+                        this.setBlockState(reader, pos.add(i, j,k ), Blocks.AIR.getDefaultState());
                     }
 
                 }

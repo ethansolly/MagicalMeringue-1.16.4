@@ -57,7 +57,9 @@ public class RayTraceMessage {
         BREAK_BLOCK,
         DANCING_LIGHTS,
         EXCHANGE,
-        LEVITATE
+        LASSO,
+        LEVITATE,
+        SEPARATE
     }
 
 }
