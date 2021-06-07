@@ -1,0 +1,5 @@
+{
+  "loader": "forge:obj",
+  "model": "magical_meringue:models/block/spinning_wheel_base.obj",
+  "flip-v": true
+}

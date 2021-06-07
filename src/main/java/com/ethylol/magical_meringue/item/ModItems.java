@@ -21,4 +21,7 @@ public class ModItems {
     @ObjectHolder("platonium_ingot")
     public static Item platonium_ingot = null;
 
+    @ObjectHolder("magentium_strand")
+    public static Item magentium_strand = null;
+
 }

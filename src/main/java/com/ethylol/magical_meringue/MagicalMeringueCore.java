@@ -2,14 +2,13 @@ package com.ethylol.magical_meringue;
 
 import com.ethylol.magical_meringue.capabilities.Capabilities;
 import com.ethylol.magical_meringue.entity.CaveLordEntity;
-import com.ethylol.magical_meringue.entity.ModEntities;
+import com.ethylol.magical_meringue.entity.ModEntityTypes;
 import com.ethylol.magical_meringue.entity.UnicornEntity;
 import com.ethylol.magical_meringue.event.RegistrationHandler;
 import com.ethylol.magical_meringue.network.NetworkHandler;
 import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -37,7 +36,7 @@ public class MagicalMeringueCore {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
 
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(IRecipeSerializer.class, RegistrationHandler::registerRecipe);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(IRecipeSerializer.class, RegistrationHandler::registerRecipes);
 
     }
 
@@ -54,8 +53,8 @@ public class MagicalMeringueCore {
         Capabilities.register();
 
         event.enqueueWork(() -> {
-            GlobalEntityTypeAttributes.put(ModEntities.unicorn, UnicornEntity.setCustomAttributes().create());
-            GlobalEntityTypeAttributes.put(ModEntities.cave_lord, CaveLordEntity.setCustomAttributes().create());
+            GlobalEntityTypeAttributes.put(ModEntityTypes.unicorn, UnicornEntity.setCustomAttributes().create());
+            GlobalEntityTypeAttributes.put(ModEntityTypes.cave_lord, CaveLordEntity.setCustomAttributes().create());
         });
 
     }
@@ -63,15 +62,18 @@ public class MagicalMeringueCore {
     public void clientSetup(final FMLClientSetupEvent event) {
         //Client setup
         RegistrationHandler.registerEntityRenderers();
+        RegistrationHandler.registerTileEntityRenderers();
     }
 
     public void enqueueIMC(final InterModEnqueueEvent event) {
         //Intermod comms
+
     }
 
     public void processIMC(final InterModProcessEvent event) {
         //Recieve/process imc
     }
+
     public static Logger getLogger() {
         return logger;
     }

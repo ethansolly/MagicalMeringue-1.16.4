@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "sst",
+    "ssw",
+    "w w"
+  ],
+  "key": {
+    "t": {
+      "item": "magical_meringue:tachium_ingot"
+    },
+    "s": {
+      "tag": "forge:rods/wooden"
+    },
+    "w": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "result": {
+    "item": "magical_meringue:spinning_wheel",
+    "count": 1
+  }
+}

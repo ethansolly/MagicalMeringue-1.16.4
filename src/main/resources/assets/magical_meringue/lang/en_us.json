@@ -1,12 +1,15 @@
 {
+    "block.magical_meringue.magentium_block": "Magentium Block",
     "block.magical_meringue.platonium_block": "Platonium Block",
+    "block.magical_meringue.spinning_wheel": "Spinning Wheel",
     "block.magical_meringue.tachium_block": "Tachium Block",
     "block.magical_meringue.tachium_ore": "Tachium Ore",
 
     "entity.magical_meringue.cave_lord": "Cave Lord",
 
-    "item.magical_meringue.spellbook": "Spellbook",
+    "item.magical_meringue.magentium_strand": "Magentium Strand",
     "item.magical_meringue.platonium_ingot": "Platonium Ingot",
+    "item.magical_meringue.spellbook": "Spellbook",
     "item.magical_meringue.tachium_ingot": "Tachium Ingot",
     "item.magical_meringue.wand": "Wand",
 

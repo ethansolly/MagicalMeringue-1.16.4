@@ -5,7 +5,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraftforge.registries.ObjectHolder;
 
 @ObjectHolder(MagicalMeringueCore.MODID)
-public class ModEntities {
+public class ModEntityTypes {
 
     @ObjectHolder("unicorn")
     public static EntityType<UnicornEntity> unicorn = null;

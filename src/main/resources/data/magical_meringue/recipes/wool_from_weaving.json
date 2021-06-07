@@ -1,0 +1,6 @@
+{
+  "type": "magical_meringue:spinning_wheel_recipe",
+  "input": "minecraft:string",
+  "output": "minecraft:white_wool",
+  "strandColor": "16777215"
+}

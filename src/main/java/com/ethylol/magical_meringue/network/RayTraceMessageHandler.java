@@ -7,15 +7,14 @@ import com.ethylol.magical_meringue.capabilities.mana.IManaHandler;
 import com.ethylol.magical_meringue.capabilities.mana.ManaMessage;
 import com.ethylol.magical_meringue.item.ModItems;
 import com.ethylol.magical_meringue.magic.damage.Acid;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.TorchBlock;
-import net.minecraft.block.WallTorchBlock;
+import com.ethylol.magical_meringue.magic.effects.two.Separate;
+import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
@@ -33,7 +32,9 @@ import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class RayTraceMessageHandler implements BiConsumer<RayTraceMessage, Supplier<NetworkEvent.Context>> {
@@ -174,15 +175,24 @@ public class RayTraceMessageHandler implements BiConsumer<RayTraceMessage, Suppl
                     if (tachium_count >= 4) {
                         //Separate!
 
-                        if (blockCenter.getBlock() == ModBlocks.platonium_block && manaHandler.getMana(1) >= 4) {
+                        if (!Separate.isRegistered())
+                            Separate.registerSeparationMap();
+
+                        Map<Block, Function<World, Item>> separationMap = Separate.getSeparationMap();
+                        Item item;
+                        if (separationMap.containsKey(blockCenter.getBlock())
+                                && (item = separationMap.get(blockCenter.getBlock()).apply(w)) != null
+                                && manaHandler.getMana(1) >= tachium_count) {
+
 
                             int finalTachium_count = tachium_count;
+
                             ctx.get().enqueueWork(() -> {
 
                                 w.removeBlock(pos, false);
 
                                 for (int i = 0; i < finalTachium_count; i++) {
-                                    ItemEntity itemEntity = new ItemEntity(w, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(ModItems.platonium_ingot));
+                                    ItemEntity itemEntity = new ItemEntity(w, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(item));
                                     w.addEntity(itemEntity);
                                 }
 

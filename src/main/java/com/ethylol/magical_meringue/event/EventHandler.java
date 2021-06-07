@@ -7,50 +7,32 @@ import com.ethylol.magical_meringue.capabilities.join.JoinHandler;
 import com.ethylol.magical_meringue.capabilities.join.JoinMessage;
 import com.ethylol.magical_meringue.capabilities.join.JoinProvider;
 import com.ethylol.magical_meringue.capabilities.mana.IManaHandler;
-import com.ethylol.magical_meringue.capabilities.mana.ManaHandler;
 import com.ethylol.magical_meringue.capabilities.mana.ManaMessage;
 import com.ethylol.magical_meringue.capabilities.mana.ManaProvider;
 import com.ethylol.magical_meringue.entity.CaveLordEntity;
-import com.ethylol.magical_meringue.entity.ModEntities;
+import com.ethylol.magical_meringue.entity.ModEntityTypes;
 import com.ethylol.magical_meringue.item.ModItems;
-import com.ethylol.magical_meringue.item.Spellbook;
 import com.ethylol.magical_meringue.utils.Utils;
 import net.minecraft.block.*;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.INBT;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.IntegerProperty;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.Dimension;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.server.TicketType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -61,8 +43,6 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.ArrayList;
 
@@ -108,34 +88,6 @@ public class EventHandler {
         }
     }
 
-    /*
-    @SubscribeEvent
-    public static void onItemPickup(net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemPickupEvent event) {
-        ItemStack stack = event.getStack();
-        EntityPlayer player = event.player;
-        if (stack.getItem() == ModItems.spellbook) {
-            NBTTagCompound compound;
-            if (stack.hasTagCompound() && !stack.getTagCompound().hasKey("boundTo")) {
-                //MagicalMeringueCore.getLogger().debug("----------Has compound----------");
-                compound = stack.getTagCompound();
-                compound.setUniqueId("boundTo", player.getUniqueID());
-                stack.setTagCompound(compound);
-            }
-            else if (!stack.hasTagCompound()) {
-                //MagicalMeringueCore.getLogger().debug("----------Has NO compound----------");
-                compound = new NBTTagCompound();
-                compound.setUniqueId("boundTo", player.getUniqueID());
-                stack.setTagCompound(compound);
-            }
-            else {
-                //MagicalMeringueCore.getLogger().debug("----------Has compound and is bound???----------");
-            }
-        }
-        else {
-            //MagicalMeringueCore.getLogger().debug("----------ISN'T A SPELLBOOK???----------");
-        }
-    }
-     */
 
     @SubscribeEvent
     public static void cloneEvent(PlayerEvent.Clone event) {
@@ -173,13 +125,6 @@ public class EventHandler {
                         Capabilities.sendManaMessageToClient(player, manaHandler);
                     }
                 }
-
-                /*
-                if (player.world == astroworld) {
-                    ServerWorld overworld = w.getServer().getWorld(World.OVERWORLD);
-                    player.changeDimension(overworld);
-                }
-                 */
             }
 
         });
@@ -255,7 +200,7 @@ public class EventHandler {
                     world.removeBlock(pos.down(1), false);
                     world.removeBlock(pos.down(2), false);
 
-                    CaveLordEntity caveLord = ModEntities.cave_lord.create(world);
+                    CaveLordEntity caveLord = ModEntityTypes.cave_lord.create(world);
                     caveLord.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.STONE_SWORD));
                     caveLord.setItemStackToSlot(EquipmentSlotType.HEAD, new ItemStack(Items.CREEPER_HEAD));
                     caveLord.setLocationAndAngles(pos.getX()+0.5, pos.getY()+0.55-2, pos.getZ()+0.5, 0.0F, 0.0F);
@@ -267,7 +212,7 @@ public class EventHandler {
                     world.removeBlock(pos, false);
                     world.removeBlock(pos.down(1), false);
 
-                    CaveLordEntity caveLord = ModEntities.cave_lord.create(world);
+                    CaveLordEntity caveLord = ModEntityTypes.cave_lord.create(world);
                     caveLord.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.STONE_SWORD));
                     caveLord.setItemStackToSlot(EquipmentSlotType.HEAD, new ItemStack(Items.CREEPER_HEAD));
                     caveLord.setLocationAndAngles(pos.getX()+0.5, pos.getY()+0.55-1, pos.getZ()+0.5, 0.0F, 0.0F);
@@ -278,7 +223,7 @@ public class EventHandler {
                     world.removeBlock(pos.up(1), false);
                     world.removeBlock(pos, false);
 
-                    CaveLordEntity caveLord = ModEntities.cave_lord.create(world);
+                    CaveLordEntity caveLord = ModEntityTypes.cave_lord.create(world);
                     caveLord.setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.STONE_SWORD));
                     caveLord.setItemStackToSlot(EquipmentSlotType.HEAD, new ItemStack(Items.CREEPER_HEAD));
                     caveLord.setLocationAndAngles(pos.getX()+0.5, pos.getY()+0.55, pos.getZ()+0.5, 0.0F, 0.0F);
@@ -291,7 +236,7 @@ public class EventHandler {
 
     @SubscribeEvent
     public static void onLivingDeath(LivingDeathEvent event) {
-        if (event.getEntity().getType() == ModEntities.cave_lord) {
+        if (event.getEntity().getType() == ModEntityTypes.cave_lord) {
             Entity trueSource = event.getSource().getTrueSource();
             if (trueSource != null && trueSource.getType() == EntityType.PLAYER) {
                 PlayerEntity player = (PlayerEntity) trueSource;

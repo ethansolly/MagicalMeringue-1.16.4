@@ -1,0 +1,6 @@
+{
+  "type": "magical_meringue:spinning_wheel_recipe",
+  "input": "magical_meringue:magentium_strand",
+  "output": "magical_meringue:magentium_block",
+  "strandColor": "16731391"
+}

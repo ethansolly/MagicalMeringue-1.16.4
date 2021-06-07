@@ -7,18 +7,22 @@ import com.ethylol.magical_meringue.capabilities.mana.IManaHandler;
 import com.ethylol.magical_meringue.capabilities.mana.ManaMessage;
 import com.ethylol.magical_meringue.capabilities.mana.ManaMessageHandler;
 import com.ethylol.magical_meringue.item.ModItems;
+import com.ethylol.magical_meringue.tileentity.SpinningWheelTileEntity;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.handler.codec.EncoderException;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTSizeTracker;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
@@ -29,6 +33,7 @@ public class NetworkHandler {
     private static int discriminator = 0;
 
     public static void register(SimpleChannel network) {
+
         network.registerMessage(discriminator++, ManaMessage.class, (manaMessage, buffer) -> {
             buffer.writeInt(manaMessage.getLvl());
             for (float f : manaMessage.getMana()) {
@@ -94,6 +99,25 @@ public class NetworkHandler {
             }
             return new UpdateBookMessage(bookStack);
         }, new UpdateBookMessage.UpdateBookMessageHandler());
+
+        //Send from server to clients
+        network.registerMessage(discriminator++, SyncSpinningWheelMessage.class, (message, buf) -> {
+            buf.writeInt(message.getPos().getX());
+            buf.writeInt(message.getPos().getY());
+            buf.writeInt(message.getPos().getZ());
+            buf.writeItemStack(message.getItemStack());
+        }, buf -> new SyncSpinningWheelMessage(new BlockPos(buf.readInt(), buf.readInt(), buf.readInt()), buf.readItemStack()), (message, ctx) -> {
+            World world = Minecraft.getInstance().world;
+            if (world != null) {
+                TileEntity te = world.getTileEntity(message.getPos());
+                if (te instanceof SpinningWheelTileEntity) {
+                    SpinningWheelTileEntity swte = (SpinningWheelTileEntity) te;
+                    swte.setItemstack(message.getItemStack());
+                }
+            }
+        });
     }
+
+
 
 }
